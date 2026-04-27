@@ -6,22 +6,22 @@
         <div class="avatar">👴</div>
         <div class="greeting-section">
           <h1 class="greeting-text">{{ greeting }}</h1>
-          <p class="user-name">{{ userInfo.name || '加载中...' }}</p>
+          <p class="user-name">张大爷</p>
           <div class="date">{{ date }}</div>
         </div>
         <div class="weather-section">
           <div class="weather-item">
             <span class="weather-icon">☀️</span>
             <div class="weather-info">
-              <p class="weather-status">{{ weatherData.condition || '晴朗' }}</p>
-              <p class="weather-temp">{{ weatherData.temperature || '22°C' }}</p>
+              <p class="weather-status">晴朗</p>
+              <p class="weather-temp">22°C</p>
             </div>
           </div>
           <div class="weather-item">
             <span class="weather-icon">💧</span>
             <div class="weather-info">
               <p class="weather-status">适宜</p>
-              <p class="weather-temp">湿度 {{ weatherData.humidity || '45%' }}</p>
+              <p class="weather-temp">湿度 45%</p>
             </div>
           </div>
         </div>
@@ -74,22 +74,30 @@
         </div>
         <div class="emergency-contacts">
           <div class="contact-list">
-            <button 
-              v-for="contact in emergencyContacts" 
-              :key="contact.id"
-              class="contact-item" 
-              @click="callEmergencyContact(contact.name, contact.phone)"
-            >
-              <div class="contact-icon">{{ contact.icon }}</div>
+            <button class="contact-item" @click="callEmergencyContact('儿子', '13800138000')">
+              <div class="contact-icon">👨</div>
               <div class="contact-info">
-                <p class="contact-name">{{ contact.name }}</p>
-                <p class="contact-phone">{{ contact.phone }}</p>
+                <p class="contact-name">儿子</p>
+                <p class="contact-phone">138****8000</p>
               </div>
               <div class="contact-call">📞</div>
             </button>
-            <div v-if="emergencyContacts.length === 0" class="no-contacts">
-              <p>暂无紧急联系人</p>
-            </div>
+            <button class="contact-item" @click="callEmergencyContact('女儿', '13900139000')">
+              <div class="contact-icon">👩</div>
+              <div class="contact-info">
+                <p class="contact-name">女儿</p>
+                <p class="contact-phone">139****9000</p>
+              </div>
+              <div class="contact-call">📞</div>
+            </button>
+            <button class="contact-item" @click="callEmergencyContact('社区医生', '13700137000')">
+              <div class="contact-icon">👨‍⚕️</div>
+              <div class="contact-info">
+                <p class="contact-name">社区医生</p>
+                <p class="contact-phone">137****7000</p>
+              </div>
+              <div class="contact-call">📞</div>
+            </button>
           </div>
         </div>
       </div>
@@ -107,7 +115,7 @@
       </button>
       <button class="nav-item ai-nav-item" @click="goToAIChat">
         <div class="ai-nav-icon">
-          <span class="ai-icon">🤖</span>
+          <img src="E:\Open_source_projects\SilverHairIntelligentCare\images\aiChat.png" alt="AI" class="ai-icon-image" />
         </div>
         <span class="nav-text">AI对话</span>
       </button>
@@ -128,19 +136,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { safetyAPI, elderlyAPI, authAPI } from '../../services/api'
+import { safetyAPI } from '../../services/api'
 
 const router = useRouter()
 const greeting = ref('')
 const date = ref('')
 const loading = ref(false)
-const userInfo = ref({ name: '' })
-const weatherData = ref({ condition: '晴朗', temperature: '22°C', humidity: '45%' })
-const emergencyContacts = ref([])
-const userId = ref(localStorage.getItem('userId'))
-const elderId = ref('')
 
-onMounted(async () => {
+onMounted(() => {
   // 计算问候语
   const hour = new Date().getHours()
   if (hour < 12) {
@@ -160,66 +163,9 @@ onMounted(async () => {
   }
   date.value = new Date().toLocaleDateString('zh-CN', options)
 
-  // 获取用户信息
-  await getUserInfo()
-  
-  // 获取紧急联系人
-  await getEmergencyContacts()
-  
   // 初始化位置信息
   getLocation()
-  
-  // 获取天气信息
-  getWeatherData()
 })
-
-const getUserInfo = async () => {
-  try {
-    if (userId.value) {
-      const user = await authAPI.getUserById(userId.value)
-      // 后端返回的用户对象中没有 name 属性，而是有 realName 属性
-      userInfo.value = {
-        name: user.realName || '加载中...'
-      }
-      
-      // 获取老人信息
-      const elderlyResponse = await elderlyAPI.getElderlyList({ userId: userId.value })
-      if (elderlyResponse && elderlyResponse.data && elderlyResponse.data.length > 0) {
-        elderId.value = elderlyResponse.data[0].id
-      }
-    }
-  } catch (error) {
-    console.error('获取用户信息失败:', error)
-  }
-}
-
-const getEmergencyContacts = async () => {
-  try {
-    // 从后端API获取紧急联系人
-    // 这里使用模拟数据，实际应从API获取
-    emergencyContacts.value = [
-      { id: 1, name: '儿子', phone: '138****8000', icon: '👨' },
-      { id: 2, name: '女儿', phone: '139****9000', icon: '👩' },
-      { id: 3, name: '社区医生', phone: '137****7000', icon: '👨‍⚕️' }
-    ]
-  } catch (error) {
-    console.error('获取紧急联系人失败:', error)
-  }
-}
-
-const getWeatherData = async () => {
-  try {
-    // 从天气API获取天气信息
-    // 这里使用模拟数据，实际应从API获取
-    weatherData.value = {
-      condition: '晴朗',
-      temperature: '22°C',
-      humidity: '45%'
-    }
-  } catch (error) {
-    console.error('获取天气信息失败:', error)
-  }
-}
 
 const goToHome = () => {
   router.push('/elderly')
@@ -278,21 +224,14 @@ const callEmergencyContact = (name, phone) => {
 const triggerSOS = async () => {
   console.log('触发SOS紧急求助')
   try {
-    if (!elderId.value) {
-      alert('请先登录')
-      return
-    }
-    
-    // 发送SOS求助信号
+    // 模拟发送SOS求助信号
     const sosData = {
-      elderId: elderId.value,
-      location: '获取中...',
-      description: '老人触发了SOS紧急求助',
-      requestTime: new Date().toISOString()
+      elderId: 1,
+      type: 'emergency',
+      message: '老人触发了SOS紧急求助',
+      timestamp: new Date().toISOString()
     }
-    
-    const response = await safetyAPI.createSos(sosData)
-    console.log('SOS求助信号已发送:', response)
+    console.log('SOS求助信号已发送:', sosData)
     
     // 跳转到紧急求助响应页面
     router.push('/elderly/emergency-response')
@@ -323,16 +262,14 @@ const triggerSOS = async () => {
 
 const getLocation = async () => {
   try {
-    if (!elderId.value) return
-    
-    // 获取位置信息
+    // 模拟获取位置信息
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const location = {
-          elderId: elderId.value,
-          longitude: position.coords.longitude.toString(),
-          latitude: position.coords.latitude.toString(),
-          recordTime: new Date().toISOString()
+          elderId: 1,
+          longitude: position.coords.longitude,
+          latitude: position.coords.latitude,
+          address: '获取中...'
         }
         // 保存位置信息
         await safetyAPI.createLocation(location)
@@ -722,9 +659,11 @@ const getLocation = async () => {
   transition: all 0.3s ease;
 }
 
-.ai-icon {
-  font-size: 2rem;
-  color: white;
+.ai-icon-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 .ai-nav-item:hover .ai-nav-icon {

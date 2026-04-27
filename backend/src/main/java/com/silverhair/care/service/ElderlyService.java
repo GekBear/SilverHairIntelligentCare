@@ -28,7 +28,15 @@ public class ElderlyService {
         
         // 根据条件查询
         Page<UserElder> pageResult;
-        pageResult = elderlyRepository.findAll(pageable);
+        if (StringUtils.hasText(name)) {
+            pageResult = elderlyRepository.findByNameContaining(name, pageable);
+        } else if (StringUtils.hasText(phone)) {
+            pageResult = elderlyRepository.findByPhoneContaining(phone, pageable);
+        } else if (status != null) {
+            pageResult = elderlyRepository.findByStatus(status, pageable);
+        } else {
+            pageResult = elderlyRepository.findAll(pageable);
+        }
         
         return PageResult.of(pageResult.getContent(), pageResult.getTotalElements(), page, size);
     }
@@ -41,6 +49,23 @@ public class ElderlyService {
     public UserElder updateElderly(Long id, UserElder elderly) {
         UserElder existingElderly = elderlyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("老人信息不存在"));
+        
+        // 更新字段
+        if (elderly.getName() != null) {
+            existingElderly.setName(elderly.getName());
+        }
+        if (elderly.getPhone() != null) {
+            existingElderly.setPhone(elderly.getPhone());
+        }
+        if (elderly.getAddress() != null) {
+            existingElderly.setAddress(elderly.getAddress());
+        }
+        if (elderly.getStatus() != null) {
+            existingElderly.setStatus(elderly.getStatus());
+        }
+        if (elderly.getRemark() != null) {
+            existingElderly.setRemark(elderly.getRemark());
+        }
         
         return elderlyRepository.save(existingElderly);
     }

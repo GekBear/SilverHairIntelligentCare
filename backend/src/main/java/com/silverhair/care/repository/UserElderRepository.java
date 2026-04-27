@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 public interface UserElderRepository extends JpaRepository<UserElder, Long> {
     UserElder findByUserId(Long userId);
     
-    // Page<UserElder> findByNameContaining(String name, Pageable pageable);
+    Page<UserElder> findByNameContaining(String name, Pageable pageable);
     
-    // Page<UserElder> findByPhoneContaining(String phone, Pageable pageable);
+    Page<UserElder> findByPhoneContaining(String phone, Pageable pageable);
     
-    // Page<UserElder> findByStatus(Integer status, Pageable pageable);
+    Page<UserElder> findByStatus(Integer status, Pageable pageable);
 }

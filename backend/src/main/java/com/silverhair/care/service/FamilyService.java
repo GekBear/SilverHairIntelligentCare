@@ -26,7 +26,13 @@ public class FamilyService {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createTime"));
         
         Page<UserChild> pageResult;
-        pageResult = familyRepository.findAll(pageable);
+        if (StringUtils.hasText(name)) {
+            pageResult = familyRepository.findByNameContaining(name, pageable);
+        } else if (StringUtils.hasText(phone)) {
+            pageResult = familyRepository.findByPhoneContaining(phone, pageable);
+        } else {
+            pageResult = familyRepository.findAll(pageable);
+        }
         
         return PageResult.of(pageResult.getContent(), pageResult.getTotalElements(), page, size);
     }
@@ -39,6 +45,19 @@ public class FamilyService {
     public UserChild updateFamily(Long id, UserChild family) {
         UserChild existingFamily = familyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("子女信息不存在"));
+        
+        if (family.getName() != null) {
+            existingFamily.setName(family.getName());
+        }
+        if (family.getPhone() != null) {
+            existingFamily.setPhone(family.getPhone());
+        }
+        if (family.getRelation() != null) {
+            existingFamily.setRelation(family.getRelation());
+        }
+        if (family.getStatus() != null) {
+            existingFamily.setStatus(family.getStatus());
+        }
         
         return familyRepository.save(existingFamily);
     }
