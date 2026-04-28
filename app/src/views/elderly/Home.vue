@@ -115,7 +115,7 @@
       </button>
       <button class="nav-item ai-nav-item" @click="goToAIChat">
         <div class="ai-nav-icon">
-          <img src="E:\Open_source_projects\SilverHairIntelligentCare\images\aiChat.png" alt="AI" class="ai-icon-image" />
+          <img src="/aiChat.png" alt="AI" class="ai-icon-image" />
         </div>
         <span class="nav-text">AI对话</span>
       </button>

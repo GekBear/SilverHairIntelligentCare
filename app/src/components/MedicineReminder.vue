@@ -4,7 +4,7 @@
       <!-- 顶部区域：动画人物和标题 -->
       <div class="header-section">
         <div class="medicine-icon-container">
-          <img src="E:\Open_source_projects\SilverHairIntelligentCare\images\TakeMedicine.png" alt="用药提醒" class="medicine-image" />
+          <img src="/TakeMedicine.png" alt="用药提醒" class="medicine-image" />
         </div>
         <h3 class="reminder-title">用药提醒</h3>
       </div>
